@@ -1,7 +1,7 @@
 // Register service worker
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
-    .register("/service-worker.js")
+    .register("https://gmfesmad.github.io/dam-f05/service-worker.js")
     .then((reg) => console.log("Service Worker registered", reg))
     .catch((err) => console.log("Service Worker not registered", err));
 }

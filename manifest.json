@@ -5,7 +5,7 @@
   "background_color": "#fff",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "./dam-f05",
+  "scope": "/",
   "start_url": "/",
   "icons": [
     {

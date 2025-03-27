@@ -5,8 +5,8 @@
   "background_color": "#fff",
   "display": "standalone",
   "orientation": "portrait",
-  "scope": "/",
-  "start_url": "https://gmfesmad.github.io/dam-f05/",
+  "scope": "./dam-f05",
+  "start_url": "/",
   "icons": [
     {
       "src": "images/icons/icon-72x72.png",

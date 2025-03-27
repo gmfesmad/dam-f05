@@ -6,7 +6,7 @@ if ("serviceWorker" in navigator) {
     .catch((err) => console.log("Service Worker not registered", err));
 }
 
-let deferredPrompt;
+/*let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
   // Prevent the mini-infobar from appearing on mobile
@@ -17,7 +17,15 @@ window.addEventListener('beforeinstallprompt', (e) => {
   showInstallPromotion();
   // Optionally, send analytics event that PWA install promo was shown.
   console.log(`'beforeinstallprompt' event was fired.`);
+});*/
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredPrompt = event;
+    console.log('Install prompt captured'); // Debugging log
 });
+
 
 // Pomodoro timer
 const WORKING_TIME = 0.05;
@@ -98,6 +106,7 @@ class Timer {
     clearInterval(this.intervalId);
     this.time = WORKING_TIME * 60;
     this.intervalCount = 1;
+    this.isWorking = true;
 
     this.update();
     this.save();

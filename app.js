@@ -10,18 +10,49 @@ if ("serviceWorker" in navigator) {
 const WORKING_TIME = 0.05;
 const REST_TIME = 0.05;
 const NUMBER_OF_SESSIONS = 3;
+let sessionNumber = 0;
 
 const timerEl = document.querySelector(".timer");
 
 const timers = JSON.parse(localStorage.getItem("timers")) || [];
 
+const sessions = JSON.parse(localStorage.getItem("sessions")) || [];
+
+// Define timer buttons
+document.querySelector(".start").addEventListener("click", () => {
+  timer.start();
+});
+
+document.querySelector(".stop").addEventListener("click", () => {
+  timer.stop();
+});
+
+document.querySelector(".pause").addEventListener("click", () => {
+  timer.pause();
+});
+
+
 class Timer {
   constructor(time) {
-    this.time = time;
-    this.intervalId = null;
-    this.numberOfIntervals = NUMBER_OF_SESSIONS * 2;
-    this.intervalCount = 1;
-    this.isWorking = true;
+    if (timers != null && timers.length > 0) {
+      const t = timers.pop();
+      this.time = t.time;
+      this.intervalId = t.intervalId;
+      this.numberOfIntervals = t.numberOfIntervals;
+      this.intervalCount = t.intervalCount;
+      this.isWorking = t.isWorking;
+    } else {
+      this.time = time;
+      this.intervalId = null;
+      this.numberOfIntervals = NUMBER_OF_SESSIONS * 2;
+      this.intervalCount = 1;
+      this.isWorking = true;
+    }
+
+    const s = sessions.pop();
+    if(s != null && s.length > 0) {
+      sessionNumber = s.nrSessions;
+    }
   }
 
   start() {
@@ -35,6 +66,7 @@ class Timer {
 
         if (this.intervalCount > this.numberOfIntervals) {
           alert("All intervals completed!");
+          sessionNumber++;
           this.save();
           this.stop();
         } else {
@@ -53,14 +85,15 @@ class Timer {
     clearInterval(this.intervalId);
     this.time = WORKING_TIME * 60;
     this.intervalCount = 1;
-    this.isWorking = true;
 
     this.update();
+    this.save();
   }
 
   pause() {
     console.log("Pausing timer");
     clearInterval(this.intervalId);
+    this.save();
   }
 
   update() {
@@ -83,14 +116,25 @@ class Timer {
   }
 
   save() {
-    timers.push({
-      time: this.time,
-      intervalId: this.intervalId,
-      numberOfIntervals: this.numberOfIntervals,
-      intervalCount: this.intervalCount,
-      isWorking: this.isWorking,
-    });
+    if (this.intervalCount >= this.numberOfIntervals){
+      timers.pop();
+      sessions.push({
+        sessionNumber: sessionNumber,
+        date: new Date()
+      });
+      localStorage.setItem("sessions", JSON.stringify(sessions));
+      console.log("SESSIONS: " + JSON.stringify(sessions));
+    }else{
+      timers.push({
+        time: this.time,
+        intervalId: this.intervalId,
+        numberOfIntervals: this.numberOfIntervals,
+        intervalCount: this.intervalCount,
+        isWorking: this.isWorking,
+      });
+    }
     localStorage.setItem("timers", JSON.stringify(timers));
+    
   }
 }
 
@@ -100,22 +144,9 @@ const timer = new Timer(WORKING_TIME * 60);
 // Set initial time display
 changeDisplay(
   timer.time,
-  "Work",
+  timer.isWorking ? "Work" : "Rest",
   `${timer.intervalCount}/${timer.numberOfIntervals}`
 );
-
-// Define timer buttons
-document.querySelector(".start").addEventListener("click", () => {
-  timer.start();
-});
-
-document.querySelector(".stop").addEventListener("click", () => {
-  timer.stop();
-});
-
-document.querySelector(".pause").addEventListener("click", () => {
-  timer.pause();
-});
 
 function changeDisplay(time, mode, intervalCount = null) {
   const minutes = Math.floor(time / 60);
